@@ -70,8 +70,21 @@ public class CustomerModel {
             //TODO
             // 1. Merges items with the same product ID (combining their quantities).
             // 2. Sorts the products in the trolley by product ID.
+            for (Product p: trolley){
+                if (p.getProductId().equals(theProduct.getProductId())){
+                    p.setOrderedQuantity(p.getOrderedQuantity()+1);
+                    trolley.sort((a,b)->a.getProductId().compareTo(b.getProductId()));
+                    displayTaTrolley = ProductListFormatter.buildString(trolley);
+                    updateView();
+                    return;
+                }
+            }
+           theProduct.setOrderedQuantity(1);
             trolley.add(theProduct);
-            displayTaTrolley = ProductListFormatter.buildString(trolley); //build a String for trolley so that we can show it
+
+            trolley.sort((a,b)->a.getProductId().compareTo(b.getProductId()));
+            displayTaTrolley = ProductListFormatter.buildString(trolley);
+            updateView();
         }
         else{
             displayLaSearchResult = "Please search for an available product before adding it to the trolley";
