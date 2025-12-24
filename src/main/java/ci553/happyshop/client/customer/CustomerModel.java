@@ -38,9 +38,7 @@ public class CustomerModel {
     void search() throws SQLException {
         String productId = cusView.tfId.getText().trim();
         if(!productId.isEmpty()){
-            if (theProduct == null || !theProduct.getProductId().equals(productId)) {
-                theProduct = databaseRW.searchByProductId(productId); //search database
-            }
+            theProduct = databaseRW.searchByProductId(productId); //search database
             if(theProduct != null && theProduct.getStockQuantity()>=0){
                 double unitPrice = theProduct.getUnitPrice();
                 String description = theProduct.getProductDescription();
