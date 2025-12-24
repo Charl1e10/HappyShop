@@ -16,7 +16,7 @@ public class Product implements Comparable<Product> {
     private String proDescription;
     private String proImageName;
     private double unitPrice;
-    private int orderedQuantity =1; //The quantity of this product in the customer's order.
+    private int orderedQuantity ; //The quantity of this product in the customer's order.
     private int stockQuantity;//
 
     /**
@@ -46,6 +46,9 @@ public class Product implements Comparable<Product> {
     //a setter method
     public void setOrderedQuantity(int orderedQuantity) {
         this.orderedQuantity = orderedQuantity;
+    }
+    public void setStockQuantity(int orderedQuantity) {
+        this.stockQuantity = stockQuantity;
     }
 
     @Override

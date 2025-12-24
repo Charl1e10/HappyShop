@@ -133,7 +133,7 @@ public class DerbyRW implements DatabaseRW {
         ArrayList<Product> insufficientProducts = new ArrayList<>();
 
         String checkSql = "SELECT inStock FROM ProductTable WHERE productId = ?";
-        String updateSql = "UPDATE ProductTable SET inStock = inStock - ? WHERE productId = ?";
+        String updateSql = "UPDATE ProductTable SET inStock = ? WHERE productId = ?";
 
         // Use try-with-resources for Connection and PreparedStatements
         try (Connection conn = DriverManager.getConnection(dbURL)) {
@@ -159,7 +159,7 @@ public class DerbyRW implements DatabaseRW {
                         System.out.println("Quantity Ordered: " + product.getOrderedQuantity());
 
                         if (newStock >= 0) { // Ensure stock doesn't go negative
-                            updateStmt.setInt(1, product.getOrderedQuantity());
+                            updateStmt.setInt(1, newStock);
                             updateStmt.setString(2, product.getProductId());
                             updateStmt.addBatch();
 

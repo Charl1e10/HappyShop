@@ -38,11 +38,18 @@ public class CustomerModel {
     void search() throws SQLException {
         String productId = cusView.tfId.getText().trim();
         if(!productId.isEmpty()){
-            theProduct = databaseRW.searchByProductId(productId); //search database
-            if(theProduct != null && theProduct.getStockQuantity()>0){
+            if (theProduct == null || !theProduct.getProductId().equals(productId)) {
+                theProduct = databaseRW.searchByProductId(productId); //search database
+            }
+            if(theProduct != null && theProduct.getStockQuantity()>=0){
                 double unitPrice = theProduct.getUnitPrice();
                 String description = theProduct.getProductDescription();
                 int stock = theProduct.getStockQuantity();
+                for (Product p :trolley){
+                    if (p.getProductId().equals(theProduct.getProductId())){
+                        stock -= p.getOrderedQuantity();
+                    }
+                }
 
                 String baseInfo = String.format("Product_Id: %s\n%s,\nPrice: £%.2f", productId, description, unitPrice);
                 String quantityInfo = stock < 100 ? String.format("\n%d units left.", stock) : "";
@@ -62,7 +69,7 @@ public class CustomerModel {
         updateView();
     }
 
-    void addToTrolley(){
+    void addToTrolley() throws SQLException {
         if(theProduct!= null){
 
             // trolley.add(theProduct) — Product is appended to the end of the trolley.
@@ -70,21 +77,38 @@ public class CustomerModel {
             //TODO
             // 1. Merges items with the same product ID (combining their quantities).
             // 2. Sorts the products in the trolley by product ID.
+            if(theProduct.getStockQuantity() <= 0){
+                displayLaSearchResult = "not enough stock";
+                updateView();
+                return;
+            }
             for (Product p: trolley){
                 if (p.getProductId().equals(theProduct.getProductId())){
-                    p.setOrderedQuantity(p.getOrderedQuantity()+1);
-                    trolley.sort((a,b)->a.getProductId().compareTo(b.getProductId()));
-                    displayTaTrolley = ProductListFormatter.buildString(trolley);
-                    updateView();
-                    return;
+                    if (p.getOrderedQuantity() + 1 > theProduct.getStockQuantity()){
+                        displayLaSearchResult = "Not enough stock left";
+                        updateView();
+                        return;
+                    }
+
+                    else {
+                        p.setOrderedQuantity(p.getOrderedQuantity() + 1);
+                        trolley.sort((a, b) -> a.getProductId().compareTo(b.getProductId()));
+                        displayTaTrolley = ProductListFormatter.buildString(trolley);
+                        search();
+                        return;
+                    }
                 }
             }
-           theProduct.setOrderedQuantity(1);
+            theProduct.setOrderedQuantity(1);
             trolley.add(theProduct);
-
             trolley.sort((a,b)->a.getProductId().compareTo(b.getProductId()));
             displayTaTrolley = ProductListFormatter.buildString(trolley);
-            updateView();
+            try {
+                search();
+            }
+            catch(SQLException e){
+                updateView();
+            }
         }
         else{
             displayLaSearchResult = "Please search for an available product before adding it to the trolley";
@@ -110,6 +134,12 @@ public class CustomerModel {
                 Order theOrder = orderHub.newOrder(trolley);
                 trolley.clear();
                 displayTaTrolley ="";
+                if (theProduct != null){
+                    theProduct = databaseRW.searchByProductId(theProduct.getProductId());
+                }
+                if (theProduct != null && theProduct.getStockQuantity() == 0){
+                    theProduct = null;
+                }
                 displayTaReceipt = String.format(
                         "Order_ID: %s\nOrdered_Date_Time: %s\n%s",
                         theOrder.getOrderId(),
@@ -126,16 +156,26 @@ public class CustomerModel {
                             .append(p.getStockQuantity()).append(" available, ")
                             .append(p.getOrderedQuantity()).append(" requested)\n");
                 }
-                theProduct=null;
-
+             for (int i = trolley.size() - 1; i>=0; i--){
+                 Product trolleyProduct = trolley.get(i);
+                 for (Product p : insufficientProducts){
+                     if (trolleyProduct.getProductId().equals(p.getProductId())) {
+                     trolley.remove(i);
+                     break;
+                     }
+                 }
+             }
+             theProduct=null;
                 //TODO
                 // Add the following logic here:
                 // 1. Remove products with insufficient stock from the trolley.
                 // 2. Trigger a message window to notify the customer about the insufficient stock, rather than directly changing displayLaSearchResult.
                 //You can use the provided RemoveProductNotifier class and its showRemovalMsg method for this purpose.
                 //remember close the message window where appropriate (using method closeNotifierWindow() of RemoveProductNotifier class)
-                displayLaSearchResult = "Checkout failed due to insufficient stock for the following products:\n" + errorMsg.toString();
-                System.out.println("stock is not enough");
+                RemoveProductNotifier notifier = new RemoveProductNotifier();
+                notifier.showRemovalMsg("CheckOut Failed" + errorMsg.toString());
+                notifier.closeNotifierWindow();
+                System.out.println("CheckOut Failed");
             }
         }
         else{
@@ -158,8 +198,15 @@ public class CustomerModel {
                 existing.setOrderedQuantity(existing.getOrderedQuantity() + p.getOrderedQuantity());
             } else {
                 // Make a shallow copy to avoid modifying the original
-                grouped.put(id,new Product(p.getProductId(),p.getProductDescription(),
-                        p.getProductImageName(),p.getUnitPrice(),p.getStockQuantity()));
+                Product copy = new Product(
+                        p.getProductId(),
+                        p.getProductDescription(),
+                        p.getProductImageName(),
+                        p.getUnitPrice(),
+                        p.getStockQuantity()
+                );
+                copy.setOrderedQuantity(p.getOrderedQuantity());
+                grouped.put(id, copy);
             }
         }
         return new ArrayList<>(grouped.values());
