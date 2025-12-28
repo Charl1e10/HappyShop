@@ -72,7 +72,7 @@ public class OrderFileManager {
         if (Files.exists(sourcePath)) {
             updateOrderStateAndTime(sourceDir,orderId,newState); //Edit the file to update order state and add time
             if(!sourceDir.equals(targetDir)) //Move the file only if the source and destination are different
-                Files.move(sourcePath,targetPath);
+                Files.move(sourcePath,targetPath,StandardCopyOption.REPLACE_EXISTING);
             return true;
         }
         else{
