@@ -1,6 +1,7 @@
 package ci553.happyshop;
 
 import ci553.happyshop.client.Main;
+import ci553.happyshop.client.SystemsLauncher;
 import javafx.application.Application;
 
 /**
@@ -19,6 +20,6 @@ public class Launcher  {
      * @param args Command line arguments.
      */
     public static void main(String[] args) {
-        Application.launch(Main.class, args);  // Starts the JavaFX application through Main
+        Application.launch(SystemsLauncher.class, args);  // Starts the JavaFX application through SystemsLauncher
     }
 }

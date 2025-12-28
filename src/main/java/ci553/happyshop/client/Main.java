@@ -69,7 +69,7 @@ public class Main extends Application {
      * Also creates the RemoveProductNotifier, which tracks the position of the Customer View
      * and is triggered by the Customer Model when needed.
      */
-    private void startCustomerClient(){
+    public static void startCustomerClient(){ //Customer
         CustomerView cusView = new CustomerView();
         CustomerController cusController = new CustomerController();
         CustomerModel cusModel = new CustomerModel();
@@ -94,7 +94,7 @@ public class Main extends Application {
      *
      * Also registers the PickerModel with the OrderHub to receive order notifications.
      */
-    private void startPickerClient(){
+    public static void startPickerClient(){ //Worker
         PickerModel pickerModel = new PickerModel();
         PickerView pickerView = new PickerView();
         PickerController pickerController = new PickerController();
@@ -108,13 +108,13 @@ public class Main extends Application {
     //The OrderTracker GUI - for customer to track their order's state(Ordered, Progressing, Collected)
     //This client is simple and does not follow the MVC pattern, as it only registers with the OrderHub
     //to receive order status notifications. All logic is handled internally within the OrderTracker.
-    private void startOrderTracker(){
+    public static void startOrderTracker(){//Worker
         OrderTracker orderTracker = new OrderTracker();
         orderTracker.registerWithOrderHub();
     }
 
     //initialize the orderMap<orderId, orderState> for OrderHub during system startup
-    private void initializeOrderMap(){
+    public static void initializeOrderMap(){//?
         OrderHub orderHub = OrderHub.getOrderHub();
         orderHub.initializeOrderMap();
     }
@@ -128,7 +128,7 @@ public class Main extends Application {
      * which track the position of the Warehouse window and are triggered by the Model when needed.
      * These components are linked after launching the Warehouse interface.
      */
-    private void startWarehouseClient(){
+    public static void startWarehouseClient(){//Manager
         WarehouseView view = new WarehouseView();
         WarehouseController controller = new WarehouseController();
         WarehouseModel model = new WarehouseModel();
@@ -153,9 +153,9 @@ public class Main extends Application {
     }
 
     //starts the EmergencyExit GUI, - used to close the entire application immediatelly
-    private void startEmergencyExit(){
+    public static void startEmergencyExit(){
         EmergencyExit.getEmergencyExit();
-    }
+    }//Worker
 }
 
 
