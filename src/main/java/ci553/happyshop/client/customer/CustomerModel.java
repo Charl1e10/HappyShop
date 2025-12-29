@@ -37,17 +37,28 @@ public class CustomerModel {
     //SELECT productID, description, image, unitPrice,inStock quantity
     void search() throws SQLException {
         String productId = cusView.tfId.getText().trim();
-        if(!productId.isEmpty()){
-            theProduct = databaseRW.searchByProductId(productId); //search database
-            if(theProduct != null && theProduct.getStockQuantity()>=0){
-                double unitPrice = theProduct.getUnitPrice();
-                String description = theProduct.getProductDescription();
-                int stock = theProduct.getStockQuantity();
-                for (Product p :trolley){
-                    if (p.getProductId().equals(theProduct.getProductId())){
-                        stock -= p.getOrderedQuantity();
-                    }
+        String productName = cusView.tfName.getText().trim();
+        if (!productId.isEmpty() == !productName.isEmpty()) {
+            theProduct = null;
+            displayLaSearchResult = "please enter either a product id OR a product name";
+            updateView();
+            return;
+        }
+        if  (!productId.isEmpty()) {
+            theProduct = databaseRW.searchByProductId(productId);
+        }
+        else{
+            theProduct = databaseRW.searchByProductName(productName);
+        }
+        if(theProduct != null && theProduct.getStockQuantity()>=0) {
+            double unitPrice = theProduct.getUnitPrice();
+            String description = theProduct.getProductDescription();
+            int stock = theProduct.getStockQuantity();
+            for (Product p : trolley) {
+                if (p.getProductId().equals(theProduct.getProductId())) {
+                    stock -= p.getOrderedQuantity();
                 }
+            }
 
                 String baseInfo = String.format("Product_Id: %s\n%s,\nPrice: £%.2f", productId, description, unitPrice);
                 String quantityInfo = stock < 100 ? String.format("\n%d units left.", stock) : "";
@@ -56,14 +67,9 @@ public class CustomerModel {
             }
             else{
                 theProduct=null;
-                displayLaSearchResult = "No Product was found with ID " + productId;
-                System.out.println("No Product was found with ID " + productId);
+                displayLaSearchResult = "No Product was found";
+                System.out.println("No Product was found");
             }
-        }else{
-            theProduct=null;
-            displayLaSearchResult = "Please type ProductID";
-            System.out.println("Please type ProductID.");
-        }
         updateView();
     }
 

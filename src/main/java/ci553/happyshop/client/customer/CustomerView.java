@@ -82,14 +82,14 @@ public class CustomerView  {
         Label laId = new Label("ID:      ");
         laId.setStyle(UIStyle.labelStyle);
         tfId = new TextField();
-        tfId.setPromptText("eg. 0001");
+        tfId.setPromptText("Enter the ID");
         tfId.setStyle(UIStyle.textFiledStyle);
         HBox hbId = new HBox(10, laId, tfId);
 
         Label laName = new Label("Name:");
         laName.setStyle(UIStyle.labelStyle);
         tfName = new TextField();
-        tfName.setPromptText("implement it if you want");
+        tfName.setPromptText("Enter the name");
         tfName.setStyle(UIStyle.textFiledStyle);
         HBox hbName = new HBox(10, laName, tfName);
 

@@ -52,6 +52,16 @@ public interface DatabaseRW {
      *
      * @param proList the list of products with requested quantities to purchase
      */
+    Product searchByProductName(String productName) throws SQLException;
+
+    /**
+     * Attempts to purchase (reduce stocks of) the given list of products.
+     * Behavior:
+     * - If all requested quantities are available, stocks are reduced and an empty list is returned.
+     * - If any product does not have sufficient stock, no stock is updated and a list of all insufficient products is returned.
+     *
+     * @param proList the list of products with requested quantities to purchase
+     */
     ArrayList<Product> purchaseStocks(ArrayList<Product> proList) throws SQLException;
 
 

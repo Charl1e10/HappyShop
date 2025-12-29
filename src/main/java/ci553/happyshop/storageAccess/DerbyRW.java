@@ -68,7 +68,29 @@ public class DerbyRW implements DatabaseRW {
         }
         return product;
     }
+    public Product searchByProductName(String productName) throws SQLException {
+        Product product = null;
+        String query = "SELECT * FROM ProductTable WHERE Description LIKE ?"; //using like to find anything that contains the inputted name so they dont need the exact name
+        //including like only works with a small number of products that dont overlap one another in name
+        try (Connection conn = DriverManager.getConnection(dbURL);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+            // Set the productName parameter
+            pstmt.setString(1, productName);
 
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()){
+                    product= makeProObjFromDbRecord(rs);
+                    System.out.println("Product " + productName + " found.");
+                }else{
+                    System.out.println("Product " + productName + " not found.");
+                }
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return product;
+    }
     //helper method
     //search  by product name, return a List of products or null
     private ArrayList<Product> searchByProName(String name) {
