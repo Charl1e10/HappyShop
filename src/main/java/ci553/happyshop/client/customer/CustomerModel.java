@@ -36,27 +36,27 @@ public class CustomerModel {
 
     //SELECT productID, description, image, unitPrice,inStock quantity
     void search() throws SQLException {
-        String productId = cusView.tfId.getText().trim();
-        String productName = cusView.tfName.getText().trim();
-        if (!productId.isEmpty() == !productName.isEmpty()) {
+        String productId = cusView.tfId.getText().trim(); //gets the product ID, turns it to text and gets rid of whitespaces
+        String productName = cusView.tfName.getText().trim(); //gets the product Name, turns it to text and gets rid of whitespaces
+        if (!productId.isEmpty() == !productName.isEmpty()) { //compares if both are filled in and if neither are filled in
             theProduct = null;
             displayLaSearchResult = "please enter either a product id OR a product name";
             updateView();
             return;
         }
-        if  (!productId.isEmpty()) {
+        if  (!productId.isEmpty()) { //checks if its filled in to search by the product ID if true and sets it to the product
             theProduct = databaseRW.searchByProductId(productId);
         }
-        else{
+        else{ //else searches by the product name and sets it to the product
             theProduct = databaseRW.searchByProductName(productName);
         }
-        if(theProduct != null && theProduct.getStockQuantity()>=0) {
+        if(theProduct != null && theProduct.getStockQuantity()>=0) { //checks if theres a product to search
             double unitPrice = theProduct.getUnitPrice();
             String description = theProduct.getProductDescription();
-            int stock = theProduct.getStockQuantity();
-            for (Product p : trolley) {
-                if (p.getProductId().equals(theProduct.getProductId())) {
-                    stock -= p.getOrderedQuantity();
+            int stock = theProduct.getStockQuantity(); //gets product info
+            for (Product p : trolley) {//Goes through each product in the trolley
+                if (p.getProductId().equals(theProduct.getProductId())) {//checks if its already in the trolley
+                    stock -= p.getOrderedQuantity();//stock deduction
                 }
             }
 
@@ -82,31 +82,31 @@ public class CustomerModel {
             //TODO
             // 1. Merges items with the same product ID (combining their quantities).
             // 2. Sorts the products in the trolley by product ID.
-            if(theProduct.getStockQuantity() <= 0){
+            if(theProduct.getStockQuantity() <= 0){ //checks the stock so you cant order when 0 or less
                 displayLaSearchResult = "not enough stock";
                 updateView();
                 return;
             }
-            for (Product p: trolley){
-                if (p.getProductId().equals(theProduct.getProductId())){
-                    if (p.getOrderedQuantity() + 1 > theProduct.getStockQuantity()){
+            for (Product p: trolley){ //checks each product in the trolley
+                if (p.getProductId().equals(theProduct.getProductId())){ //checks if the product its checking in the trolley is equal to the product id your adding
+                    if (p.getOrderedQuantity() + 1 > theProduct.getStockQuantity()){ //checks if its got enough stock to add it
                         displayLaSearchResult = "Not enough stock left";
                         updateView();
                         return;
                     }
 
                     else {
-                        p.setOrderedQuantity(p.getOrderedQuantity() + 1);
-                        trolley.sort((a, b) -> a.getProductId().compareTo(b.getProductId()));
+                        p.setOrderedQuantity(p.getOrderedQuantity() + 1); //adds one to ordered
+                        trolley.sort((a, b) -> a.getProductId().compareTo(b.getProductId()));//sorts the trolley by product ID
                         displayTaTrolley = ProductListFormatter.buildString(trolley);
                         search();
                         return;
                     }
                 }
             }
-            theProduct.setOrderedQuantity(1);
-            trolley.add(theProduct);
-            trolley.sort((a,b)->a.getProductId().compareTo(b.getProductId()));
+            theProduct.setOrderedQuantity(1);//if its not already in the trolley it sets the quantity to 1
+            trolley.add(theProduct);//adds it to the trolley
+            trolley.sort((a,b)->a.getProductId().compareTo(b.getProductId()));//sorts the list in ID order
             displayTaTrolley = ProductListFormatter.buildString(trolley);
             try {
                 search();
