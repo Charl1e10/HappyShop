@@ -60,7 +60,8 @@ public class CustomerModel {
                 }
             }
 
-                String baseInfo = String.format("Product_Id: %s\n%s,\nPrice: £%.2f", productId, description, unitPrice);
+                String baseInfo = String.format("Product_Id: %s\n%s,\nPrice: £%.2f", theProduct.getProductId(), description, unitPrice);
+            //needed to get the product id as if searched by name it didnt get the product ID and displayed nothing
                 String quantityInfo = stock < 100 ? String.format("\n%d units left.", stock) : "";
                 displayLaSearchResult = baseInfo + quantityInfo;
                 System.out.println(displayLaSearchResult);

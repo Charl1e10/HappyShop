@@ -70,13 +70,14 @@ public class DerbyRW implements DatabaseRW {
     }
     public Product searchByProductName(String productName) throws SQLException {
         Product product = null;
-        String query = "SELECT * FROM ProductTable WHERE Description LIKE ?"; //using like to find anything that contains the inputted name so they dont need the exact name
-        //including like only works with a small number of products that dont overlap one another in name
+        String query = "SELECT * FROM ProductTable WHERE LOWER(description) LIKE LOWER(?)";
+        //turns the searched result to lowercase and using the like method to compare everything in the database in lowercase
         try (Connection conn = DriverManager.getConnection(dbURL);
              PreparedStatement pstmt = conn.prepareStatement(query)) {
             // Set the productName parameter
-            pstmt.setString(1, productName);
-
+            pstmt.setString(1, "%" + productName.trim().toLowerCase() + "%");
+            //uses 2 wildcards the % to search either side meaning its contained anywhere within the database
+            //returns a single product even if 2 have the same name - the first one it comes across
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()){
                     product= makeProObjFromDbRecord(rs);
