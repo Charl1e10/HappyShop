@@ -139,8 +139,12 @@ public class CustomerView  {
         btnCheckout.setOnAction(this::buttonClicked);
         btnCheckout.setStyle(UIStyle.buttonStyle);
 
-        HBox hbBtns = new HBox(10, btnCancel,btnCheckout);
-        hbBtns.setStyle("-fx-padding: 15px;");
+        Button btnUndo = new Button("Undo"); //creates a new button
+        btnUndo.setOnAction(this::buttonClicked);
+        btnUndo.setStyle(UIStyle.buttonStyle);
+
+        HBox hbBtns = new HBox(10, btnCancel,btnUndo,btnCheckout); //adds the button to the btns UI
+        hbBtns.setStyle("-fx-padding: 5px;"); // changed padding for all the buttons to fit
         hbBtns.setAlignment(Pos.CENTER);
 
         vbTrolleyPage = new VBox(15, laPageTitle, taTrolley, hbBtns);

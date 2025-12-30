@@ -24,10 +24,9 @@ public class CustomerModel {
     public CustomerView cusView;
     public DatabaseRW databaseRW; //Interface type, not specific implementation
                                   //Benefits: Flexibility: Easily change the database implementation.
-
+    private String lastAddedProduct;
     private Product theProduct =null; // product found from search
     private ArrayList<Product> trolley =  new ArrayList<>(); // a list of products in trolley
-
     // Four UI elements to be passed to CustomerView for display updates.
     private String imageName = "imageHolder.jpg";                // Image to show in product preview (Search Page)
     private String displayLaSearchResult = "No Product was searched yet"; // Label showing search result message (Search Page)
@@ -56,7 +55,7 @@ public class CustomerModel {
             int stock = theProduct.getStockQuantity(); //gets product info
             for (Product p : trolley) {//Goes through each product in the trolley
                 if (p.getProductId().equals(theProduct.getProductId())) {//checks if its already in the trolley
-                    stock -= p.getOrderedQuantity();//stock deduction
+                    stock -= p.getOrderedQuantity();//stock deduction only for ui
                 }
             }
 
@@ -97,6 +96,7 @@ public class CustomerModel {
 
                     else {
                         p.setOrderedQuantity(p.getOrderedQuantity() + 1); //adds one to ordered
+                        lastAddedProduct = p.getProductId();//makes the variable the last one added for the undo button
                         trolley.sort((a, b) -> a.getProductId().compareTo(b.getProductId()));//sorts the trolley by product ID
                         displayTaTrolley = ProductListFormatter.buildString(trolley);
                         search();
@@ -106,6 +106,7 @@ public class CustomerModel {
             }
             theProduct.setOrderedQuantity(1);//if its not already in the trolley it sets the quantity to 1
             trolley.add(theProduct);//adds it to the trolley
+            lastAddedProduct = theProduct.getProductId();//makes the variable the last one added for the undo button
             trolley.sort((a,b)->a.getProductId().compareTo(b.getProductId()));//sorts the list in ID order
             displayTaTrolley = ProductListFormatter.buildString(trolley);
             try {
@@ -239,6 +240,26 @@ public class CustomerModel {
             imageName = "imageHolder.jpg";
         }
         cusView.update(imageName, displayLaSearchResult, displayTaTrolley,displayTaReceipt);
+    }
+    void Undo() throws SQLException {
+        if (trolley.isEmpty()|| lastAddedProduct == null){//checks if the trolley has anything in to undo
+            return;
+        }
+        for (int i = trolley.size() - 1; i>=0; i--){ // gets the size of the trolley and goes through each one going backwards
+            Product p = trolley.get(i);//gets the current product
+            if (p.getProductId().equals(lastAddedProduct)) {//checks if the current product in trolley is the same as the last one added
+                int NewQ = p.getOrderedQuantity() - 1; //sets new quantity to -1 of the current ordered quantity
+                if (NewQ <= 0){//checks if when its been taken away the ordered quantity has reached 0
+                    trolley.remove(i);//it removes the item
+                }
+                else{
+                    p.setOrderedQuantity(NewQ);//otherwise sets it to the new quantity after the undo
+                }
+                break;
+            }
+        }
+        displayTaTrolley=ProductListFormatter.buildString(trolley);//rebuilds the trolley to display changes
+        search();//calls searched for the stock ui changes
     }
      // extra notes:
      //Path.toUri(): Converts a Path object (a file or a directory path) to a URI object.

@@ -23,6 +23,9 @@ public class CustomerController {
             case "OK & Close":
                 cusModel.closeReceipt();
                 break;
+            case "Undo"://adds the undo button
+                cusModel.Undo();//links to the undo method
+                break;
         }
     }
 
