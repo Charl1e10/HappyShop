@@ -63,7 +63,7 @@ public class SystemsLauncher extends Application{ //initialises all UI
         if (workers > 0 && customers == 0){//checks if theres customer tills open
             info2.setText("No Customer Tills");
         }
-        if((textCustomers != null && textWorkers != null && textManagers != null) && (workers > 0 && managers > 0) && customers != 0){
+        if((textCustomers != null && textWorkers != null && textManagers != null) && (workers > 0 && managers > 0) && customers > 0){
             //checks if all the text fields are filled out and if managers and workers are more than 0 and that theres not 0 customer tills open
             for (int i = 0; i < customers; i++){ // starts up the customer client for each customer till thats open
                 Main.startCustomerClient();
