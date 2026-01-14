@@ -25,7 +25,7 @@ public class CustomerModel {
     public DatabaseRW databaseRW; //Interface type, not specific implementation
                                   //Benefits: Flexibility: Easily change the database implementation.
     private String lastAddedProduct;
-    private Product theProduct =null; // product found from search
+    public Product theProduct =null; // product found from search
     private ArrayList<Product> trolley =  new ArrayList<>(); // a list of products in trolley
     // Four UI elements to be passed to CustomerView for display updates.
     private String imageName = "imageHolder.jpg";                // Image to show in product preview (Search Page)
@@ -45,9 +45,11 @@ public class CustomerModel {
         }
         if  (!productId.isEmpty()) { //checks if its filled in to search by the product ID if true and sets it to the product
             theProduct = databaseRW.searchByProductId(productId);
+            System.out.println("Found by id");
         }
         else{ //else searches by the product name and sets it to the product
             theProduct = databaseRW.searchByProductName(productName);
+            System.out.println("Found by name");
         }
         if(theProduct != null && theProduct.getStockQuantity()>=0) { //checks if theres a product to search
             double unitPrice = theProduct.getUnitPrice();
@@ -56,6 +58,7 @@ public class CustomerModel {
             for (Product p : trolley) {//Goes through each product in the trolley
                 if (p.getProductId().equals(theProduct.getProductId())) {//checks if its already in the trolley
                     stock -= p.getOrderedQuantity();//stock deduction only for ui
+                    System.out.println("stock updated");
                 }
             }
 
@@ -83,14 +86,14 @@ public class CustomerModel {
             // 2. Sorts the products in the trolley by product ID.
             if(theProduct.getStockQuantity() <= 0){ //checks the stock so you cant order when 0 or less
                 displayLaSearchResult = "not enough stock";
-                updateView();
+                if (cusView != null) updateView();
                 return;
             }
             for (Product p: trolley){ //checks each product in the trolley
                 if (p.getProductId().equals(theProduct.getProductId())){ //checks if the product its checking in the trolley is equal to the product id your adding
                     if (p.getOrderedQuantity() + 1 > theProduct.getStockQuantity()){ //checks if its got enough stock to add it
                         displayLaSearchResult = "Not enough stock left";
-                        updateView();
+                        if (cusView != null) updateView();
                         return;
                     }
 
@@ -99,7 +102,7 @@ public class CustomerModel {
                         lastAddedProduct = p.getProductId();//makes the variable the last one added for the undo button
                         trolley.sort((a, b) -> a.getProductId().compareTo(b.getProductId()));//sorts the trolley by product ID
                         displayTaTrolley = ProductListFormatter.buildString(trolley);
-                        search();
+                        if (cusView != null) search();
                         return;
                     }
                 }
@@ -109,11 +112,12 @@ public class CustomerModel {
             lastAddedProduct = theProduct.getProductId();//makes the variable the last one added for the undo button
             trolley.sort((a,b)->a.getProductId().compareTo(b.getProductId()));//sorts the list in ID order
             displayTaTrolley = ProductListFormatter.buildString(trolley);
-            try {
-                search();
-            }
-            catch(SQLException e){
-                updateView();
+            if (cusView != null) {
+                try {
+                    search();
+                } catch (SQLException e) {
+                    updateView();
+                }
             }
         }
         else{
@@ -121,7 +125,7 @@ public class CustomerModel {
             System.out.println("must search and get an available product before add to trolley");
         }
         displayTaReceipt=""; // Clear receipt to switch back to trolleyPage (receipt shows only when not empty)
-        updateView();
+        if (cusView != null) updateView();
     }
 
     void checkOut() throws IOException, SQLException {
@@ -221,7 +225,8 @@ public class CustomerModel {
     void cancel(){
         trolley.clear();
         displayTaTrolley="";
-        updateView();
+        System.out.println("cancel");
+        if (cusView != null) updateView();
     }
     void closeReceipt(){
         displayTaReceipt="";
@@ -243,14 +248,17 @@ public class CustomerModel {
     }
     void Undo() throws SQLException {
         if (trolley.isEmpty()|| lastAddedProduct == null){//checks if the trolley has anything in to undo
+            System.out.println("No products");
             return;
         }
         for (int i = trolley.size() - 1; i>=0; i--){ // gets the size of the trolley and goes through each one going backwards
             Product p = trolley.get(i);//gets the current product
             if (p.getProductId().equals(lastAddedProduct)) {//checks if the current product in trolley is the same as the last one added
                 int NewQ = p.getOrderedQuantity() - 1; //sets new quantity to -1 of the current ordered quantity
+                System.out.println("changed quantity");
                 if (NewQ <= 0){//checks if when its been taken away the ordered quantity has reached 0
                     trolley.remove(i);//it removes the item
+                    System.out.println("removed item");
                 }
                 else{
                     p.setOrderedQuantity(NewQ);//otherwise sets it to the new quantity after the undo
