@@ -60,4 +60,22 @@ public class AddToTrolleyTest {
         trolley = customerModel.getTrolley();
         assertTrue(trolley.isEmpty());
     }
+    @Test
+    void testUndo_ReducesQuantity() throws SQLException {
+        product.setOrderedQuantity(2);
+        customerModel.getTrolley().add(product);
+        customerModel.setLastAddedProduct("0092");
+        customerModel.Undo();
+        assertEquals(1, customerModel.getTrolley().size());
+        assertEquals(1, customerModel.getTrolley().get(0).getOrderedQuantity());
+    }
+
+    @Test
+    void testUndo_RemovesProductWhenQuantityZero() throws SQLException {
+        product.setOrderedQuantity(1);
+        customerModel.getTrolley().add(product);
+        customerModel.setLastAddedProduct("0092");
+        customerModel.Undo();
+        assertTrue(customerModel.getTrolley().isEmpty());
+    }
 }

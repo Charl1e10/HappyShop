@@ -267,7 +267,10 @@ public class CustomerModel {
             }
         }
         displayTaTrolley=ProductListFormatter.buildString(trolley);//rebuilds the trolley to display changes
-        search();//calls searched for the stock ui changes
+        if (cusView != null)search();//calls searched for the stock ui changes
+    }
+    void setLastAddedProduct(String productId) {
+        this.lastAddedProduct = productId;
     }
      // extra notes:
      //Path.toUri(): Converts a Path object (a file or a directory path) to a URI object.
