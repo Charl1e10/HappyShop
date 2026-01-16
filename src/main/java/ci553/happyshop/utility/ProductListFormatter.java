@@ -15,18 +15,19 @@ public class ProductListFormatter {
     /**
      * Builds a formatted string showing each product's ID, description,
      * quantity ordered, and total price. Also includes a total price at the end.
+     *
      * @param proList a List of products
      * @return A nicely formatted string representation of the product list with totals
      */
     public static String buildString(ArrayList<Product> proList) {
         StringBuilder sb = new StringBuilder();
-        double totalPrice=0;
+        double totalPrice = 0;
         for (Product pr : proList) {
             int orderedQuantity = pr.getOrderedQuantity();
             //%-18.18s, format the argument as a String,
             // -18 → Left-align the string in 18-character wide space.
             //.18 → Truncate the string to at most 18 characters
-            String aProduct=String.format(" %-7s %-18.18s (%2d) £%7.2f\n",
+            String aProduct = String.format(" %-7s %-18.18s (%2d) £%7.2f\n",
                     pr.getProductId(),
                     pr.getProductDescription(),
                     pr.getOrderedQuantity(),
@@ -42,5 +43,18 @@ public class ProductListFormatter {
         sb.append(lineSeparator);
         sb.append(total);
         return sb.toString();
+    }
+
+    public static String buildAllProductsString(ArrayList<Product> proList) {
+        StringBuilder sb = new StringBuilder();
+        for (Product pr : proList) {
+            sb.append(String.format("%-7s %-18.18s £%7.2f %3d\n",
+                    pr.getProductId(),
+                    pr.getProductDescription(),
+                    pr.getUnitPrice(),
+                    pr.getStockQuantity()));
+        }
+        return sb.toString();
+
     }
 }

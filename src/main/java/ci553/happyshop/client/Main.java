@@ -1,5 +1,6 @@
 package ci553.happyshop.client;
 
+import ci553.happyshop.catalogue.Product;
 import ci553.happyshop.client.customer.*;
 
 import ci553.happyshop.client.emergency.EmergencyExit;
@@ -15,6 +16,7 @@ import ci553.happyshop.storageAccess.DatabaseRWFactory;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * The Main JavaFX application class. The Main class is executable directly.
@@ -81,6 +83,8 @@ public class Main extends Application {
         cusModel.databaseRW = databaseRW;
         cusView.start(new Stage());
 
+        ArrayList<Product> allProducts = cusModel.getAllProducts();
+        new AllProducts(allProducts);
         //RemoveProductNotifier removeProductNotifier = new RemoveProductNotifier();
         //removeProductNotifier.cusView = cusView;
         //cusModel.removeProductNotifier = removeProductNotifier;

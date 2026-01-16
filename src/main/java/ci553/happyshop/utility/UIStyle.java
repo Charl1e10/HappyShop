@@ -34,8 +34,8 @@ public final class UIStyle {
         throw new UnsupportedOperationException("UIStyle is a utility class");
     }
 
-    public static final int customerWinWidth = 610;
-    public static final int customerWinHeight = 300;
+    public static int customerWinWidth = 610;
+    public static int customerWinHeight = 300;
     public static final int removeProNotifierWinWidth = customerWinWidth / 2 + 160;
     public static final int removeProNotifierWinHeight = 230;
 

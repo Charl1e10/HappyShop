@@ -119,6 +119,29 @@ public class DerbyRW implements DatabaseRW {
 
         return productList; // could be empty if no matches
     }
+    public ArrayList<Product> getAllProducts(){
+        ArrayList<Product> productList = new ArrayList<>();
+        String query = "SELECT * FROM ProductTable";
+
+        try (Connection conn = DriverManager.getConnection(dbURL);
+             PreparedStatement stmt = conn.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                String productId = rs.getString("productID");
+                String description = rs.getString("description");
+                String image = rs.getString("image");
+                double unitPrice = rs.getDouble("unitPrice");
+                int inStock = rs.getInt("inStock");
+                Product p = new Product(productId, description, image, unitPrice, inStock);
+                productList.add(p);
+            }
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return productList;
+    }
+
 
     //make a Product object from the database record
     private Product makeProObjFromDbRecord(ResultSet rs) throws SQLException {
